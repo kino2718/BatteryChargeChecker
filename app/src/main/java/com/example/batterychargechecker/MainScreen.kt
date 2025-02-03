@@ -19,25 +19,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.batterychargechecker.ui.theme.TextAlpha
 import kotlin.math.roundToInt
 
 @Composable
 fun MainScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    mainViewModel: MainViewModel = viewModel()
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = { MyTopBar(title = stringResource(R.string.app_name)) }
     ) { innerPadding ->
-        Contents(modifier = Modifier.padding(innerPadding))
+        Contents(
+            viewModel = mainViewModel,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
 
@@ -57,6 +61,7 @@ private fun MyTopBar(
 
 @Composable
 private fun Contents(
+    viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -65,51 +70,51 @@ private fun Contents(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
     ) {
-        var monitorOn by remember { mutableStateOf(false) }
+        val monitorOn by viewModel.monitorOn.collectAsStateWithLifecycle()
 
         MySwitch(
             title = stringResource(id = R.string.monitor_charging),
             checked = monitorOn,
-            onCheckedChange = { monitorOn = it }
+            onCheckedChange = { viewModel.setMonitorOn(it) }
         )
 
-        var monitorLevel by remember { mutableIntStateOf(0) }
+        val monitorLevel by viewModel.monitorLevel.collectAsStateWithLifecycle()
 
         MySlider(
             title = stringResource(id = R.string.monitor_level, monitorLevel),
             startLabel = stringResource(id = R.string.monitor_level_min),
             endLabel = stringResource(id = R.string.monitor_level_max),
             value = monitorLevel.toFloat(),
-            onValueChange = { monitorLevel = it.roundToInt() },
+            onValueChange = { viewModel.setMonitorLevel(it.roundToInt()) },
             valueRange = 0f..100f,
             steps = 99,
         )
 
-        var notificationDuration by remember { mutableIntStateOf(5) }
+        val notificationDuration by viewModel.notificationDuration.collectAsStateWithLifecycle()
 
         MySlider(
             title = stringResource(R.string.notification_duration, notificationDuration),
             startLabel = stringResource(R.string.notification_duration_min),
             endLabel = stringResource(R.string.notification_duration_max),
             value = notificationDuration.toFloat(),
-            onValueChange = { notificationDuration = it.roundToInt() },
+            onValueChange = { viewModel.setNotificationDuration(it.roundToInt()) },
             valueRange = 1f..10f,
             steps = 8,
         )
 
-        var repeatCount by remember { mutableIntStateOf(5) }
+        val repeatCount by viewModel.repeatCount.collectAsStateWithLifecycle()
 
         MySlider(
             title = stringResource(R.string.repeat_count, repeatCount),
             startLabel = stringResource(R.string.repeat_count_min),
             endLabel = stringResource(R.string.repeat_count_max),
             value = repeatCount.toFloat(),
-            onValueChange = { repeatCount = it.roundToInt() },
+            onValueChange = { viewModel.setRepeatCount(it.roundToInt()) },
             valueRange = 1f..10f,
             steps = 8,
         )
 
-        var repeatInterval by remember { mutableIntStateOf(1) }
+        val repeatInterval by viewModel.repeatInterval.collectAsStateWithLifecycle()
 
         if (1 < repeatCount) {
             MySlider(
@@ -117,7 +122,7 @@ private fun Contents(
                 startLabel = stringResource(R.string.repeat_interval_min),
                 endLabel = stringResource(R.string.repeat_interval_max),
                 value = repeatInterval.toFloat(),
-                onValueChange = { repeatInterval = it.roundToInt() },
+                onValueChange = { viewModel.setRepeatInterval(it.roundToInt()) },
                 valueRange = 1f..10f,
                 steps = 8,
             )
@@ -170,8 +175,16 @@ private fun MySlider(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = startLabel, style = MaterialTheme.typography.titleSmall)
-            Text(text = endLabel, style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = startLabel,
+                modifier = Modifier.alpha(TextAlpha),
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = endLabel,
+                modifier = Modifier.alpha(TextAlpha),
+                style = MaterialTheme.typography.titleSmall
+            )
         }
         Slider(
             value = value,
