@@ -1,6 +1,12 @@
 package com.example.batterychargechecker
 
 import android.app.Application
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -51,5 +57,30 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             appSettings.updateRepeatInterval(interval)
         }
+    }
+
+    fun bindMyService() {
+        Log.d(TAG, "bindMyService")
+        val i = Intent(appContext, MyService::class.java)
+        appContext.bindService(i, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    fun unbindMyService() {
+        Log.d(TAG, "unbindMyService")
+        appContext.unbindService(serviceConnection)
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            Log.d(TAG, "ServiceConnection.onServiceConnected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            Log.d(TAG, "ServiceConnection.onServiceDisconnected")
+        }
+    }
+
+    companion object {
+        private const val TAG = "MainViewModel"
     }
 }
