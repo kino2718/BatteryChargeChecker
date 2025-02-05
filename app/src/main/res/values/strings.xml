@@ -16,4 +16,6 @@
     <string name="service_description">
         Battery Charge Checker はバッテリーレベルの監視と通知を行うためにフォアグランドサービスを使用しています。
     </string>
+    <!-- notification -->
+    <string name="channel_name">バックグラウンド動作の通知</string>
 </resources>
