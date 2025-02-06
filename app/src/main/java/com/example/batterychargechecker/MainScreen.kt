@@ -87,7 +87,7 @@ private fun Contents(
             value = targetLevel.toFloat(),
             onValueChange = { viewModel.setTargetLevel(it.roundToInt()) },
             valueRange = 0f..100f,
-            steps = 99,
+            steps = 19,
         )
 
         val notificationDuration by viewModel.notificationDuration.collectAsStateWithLifecycle()
