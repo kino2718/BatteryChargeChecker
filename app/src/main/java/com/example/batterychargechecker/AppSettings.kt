@@ -5,10 +5,19 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
+
+data class AppSettingsData(
+    val monitorOn: Boolean,
+    val monitorLevel: Int,
+    val notificationDuration: Int,
+    val repeatCount: Int,
+    val repeatInterval: Int,
+)
 
 class AppSettings private constructor(context: Context) {
     private val appContext = context.applicationContext
@@ -69,6 +78,23 @@ class AppSettings private constructor(context: Context) {
         val NOTIFICATION_DURATION = intPreferencesKey("notification_duration")
         val REPEAT_COUNT = intPreferencesKey("repeat_count")
         val REPEAT_INTERVAL = intPreferencesKey("repeat_interval")
+    }
+
+
+    val appSettingsData = combine(
+        monitorOn,
+        monitorLevel,
+        notificationDuration,
+        repeatCount,
+        repeatInterval,
+    ) { monitorOn, monitorLevel, notificationDuration, repeatCount, repeatInterval ->
+        AppSettingsData(
+            monitorOn = monitorOn,
+            monitorLevel = monitorLevel,
+            notificationDuration = notificationDuration,
+            repeatCount = repeatCount,
+            repeatInterval = repeatInterval
+        )
     }
 
     companion object {

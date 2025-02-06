@@ -15,6 +15,10 @@ import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -28,13 +32,26 @@ class MyService : Service(), CoroutineScope {
 
         createNotificationChannel()
 
+        val appSettings = AppSettings.getInstance(applicationContext)
+
         launch {
-            val appSettings = AppSettings.getInstance(applicationContext)
             appSettings.monitorOn.collect { monitorOn ->
                 Log.d(TAG, "monitorOn: $monitorOn")
                 if (monitorOn) foregroundOn()
                 else foregroundOff()
             }
+        }
+
+        launch {
+            appSettings.appSettingsData
+                .conflate()
+                .onEach { delay(5 * 1000) } // sliderでの変更時、途中の値を適当に間引く
+                .collectLatest { data ->
+                    // 新しいdataが来たら以下の処理はcancelされる
+                    Log.d(TAG, "appSettingsData = $data")
+                    monitorBattery(applicationContext, data)
+                    Log.d(TAG, "exit monitorBattery")
+                }
         }
     }
 
@@ -45,6 +62,7 @@ class MyService : Service(), CoroutineScope {
 
     override fun onDestroy() {
         super.onDestroy()
+        job.cancel()
         Log.d(TAG, "onDestroy")
     }
 
