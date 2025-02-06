@@ -25,11 +25,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    val monitorLevel = appSettings.monitorLevel.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+    val targetLevel = appSettings.targetLevel.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
 
-    fun setMonitorLevel(level: Int) {
+    fun setTargetLevel(level: Int) {
         viewModelScope.launch {
-            appSettings.updateMonitorLevel(level)
+            appSettings.updateTargetLevel(level)
         }
     }
 

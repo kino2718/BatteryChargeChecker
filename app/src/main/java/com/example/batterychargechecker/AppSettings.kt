@@ -13,7 +13,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 
 data class AppSettingsData(
     val monitorOn: Boolean,
-    val monitorLevel: Int,
+    val targetLevel: Int,
     val notificationDuration: Int,
     val repeatCount: Int,
     val repeatInterval: Int,
@@ -26,8 +26,8 @@ class AppSettings private constructor(context: Context) {
         it[PreferencesKeys.MONITOR_ON] ?: false
     }.distinctUntilChanged()
 
-    val monitorLevel = appContext.dataStore.data.map {
-        it[PreferencesKeys.MONITOR_LEVEL] ?: 80
+    val targetLevel = appContext.dataStore.data.map {
+        it[PreferencesKeys.TARGET_LEVEL] ?: 80
     }.distinctUntilChanged()
 
     val notificationDuration = appContext.dataStore.data.map {
@@ -48,9 +48,9 @@ class AppSettings private constructor(context: Context) {
         }
     }
 
-    suspend fun updateMonitorLevel(level: Int) {
+    suspend fun updateTargetLevel(level: Int) {
         appContext.dataStore.edit {
-            it[PreferencesKeys.MONITOR_LEVEL] = level
+            it[PreferencesKeys.TARGET_LEVEL] = level
         }
     }
 
@@ -74,7 +74,7 @@ class AppSettings private constructor(context: Context) {
 
     private object PreferencesKeys {
         val MONITOR_ON = booleanPreferencesKey("monitor_on")
-        val MONITOR_LEVEL = intPreferencesKey("monitor_level")
+        val TARGET_LEVEL = intPreferencesKey("target_level")
         val NOTIFICATION_DURATION = intPreferencesKey("notification_duration")
         val REPEAT_COUNT = intPreferencesKey("repeat_count")
         val REPEAT_INTERVAL = intPreferencesKey("repeat_interval")
@@ -83,14 +83,14 @@ class AppSettings private constructor(context: Context) {
 
     val appSettingsData = combine(
         monitorOn,
-        monitorLevel,
+        targetLevel,
         notificationDuration,
         repeatCount,
         repeatInterval,
-    ) { monitorOn, monitorLevel, notificationDuration, repeatCount, repeatInterval ->
+    ) { monitorOn, targetLevel, notificationDuration, repeatCount, repeatInterval ->
         AppSettingsData(
             monitorOn = monitorOn,
-            monitorLevel = monitorLevel,
+            targetLevel = targetLevel,
             notificationDuration = notificationDuration,
             repeatCount = repeatCount,
             repeatInterval = repeatInterval

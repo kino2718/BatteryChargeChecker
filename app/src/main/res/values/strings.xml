@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Battery Charge Checker</string>
     <string name="monitor_charging">バッテリー充電を監視</string>
-    <string name="monitor_level">監視レベル: %1$d %%</string>
-    <string name="monitor_level_min">0 %</string>
-    <string name="monitor_level_max">100 %</string>
+    <string name="target_level">監視レベル: %1$d %%</string>
+    <string name="target_level_min">0 %</string>
+    <string name="target_level_max">100 %</string>
     <string name="notification_duration">通知期間: %1d 秒</string>
     <string name="notification_duration_min">1 秒</string>
     <string name="notification_duration_max">10 秒</string>

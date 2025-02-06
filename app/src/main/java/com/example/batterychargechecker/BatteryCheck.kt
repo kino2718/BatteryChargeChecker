@@ -16,8 +16,8 @@ import kotlin.math.roundToInt
 private const val TAG = "BatteryCheck"
 
 private data class BatteryStatus(val isCharging: Boolean, val level: Int) {
-    fun isChargingFinished(monitorLevel: Int): Boolean {
-        return isCharging && monitorLevel <= level
+    fun isChargingFinished(targetLevel: Int): Boolean {
+        return isCharging && targetLevel <= level
     }
 }
 
@@ -27,7 +27,7 @@ suspend fun monitorBattery(context: Context, settingsData: AppSettingsData) {
         Log.d(TAG, "monitorBattery: while loop")
         getBatteryStatus(context)?.let { s ->
             Log.d(TAG, "charging: ${s.isCharging}, level = ${s.level}, done = $done")
-            if (s.isChargingFinished(settingsData.monitorLevel)) {
+            if (s.isChargingFinished(settingsData.targetLevel)) {
                 // 充電完了
                 if (!done) {
                     done = notify(context, settingsData)
@@ -80,7 +80,7 @@ private suspend fun notify(context: Context, settingsData: AppSettingsData): Boo
 
             // バッテリーの状態を再度確認する
             getBatteryStatus(context)?.let { s ->
-                if (!s.isChargingFinished(settingsData.monitorLevel)) {
+                if (!s.isChargingFinished(settingsData.targetLevel)) {
                     // アラーム中に充電完了状態を満たさなくなった
                     return false
                 }

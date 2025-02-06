@@ -78,14 +78,14 @@ private fun Contents(
             onCheckedChange = { viewModel.setMonitorOn(it) }
         )
 
-        val monitorLevel by viewModel.monitorLevel.collectAsStateWithLifecycle()
+        val targetLevel by viewModel.targetLevel.collectAsStateWithLifecycle()
 
         MySlider(
-            title = stringResource(id = R.string.monitor_level, monitorLevel),
-            startLabel = stringResource(id = R.string.monitor_level_min),
-            endLabel = stringResource(id = R.string.monitor_level_max),
-            value = monitorLevel.toFloat(),
-            onValueChange = { viewModel.setMonitorLevel(it.roundToInt()) },
+            title = stringResource(id = R.string.target_level, targetLevel),
+            startLabel = stringResource(id = R.string.target_level_min),
+            endLabel = stringResource(id = R.string.target_level_max),
+            value = targetLevel.toFloat(),
+            onValueChange = { viewModel.setTargetLevel(it.roundToInt()) },
             valueRange = 0f..100f,
             steps = 99,
         )
