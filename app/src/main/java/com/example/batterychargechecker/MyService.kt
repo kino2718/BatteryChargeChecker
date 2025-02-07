@@ -88,7 +88,9 @@ class MyService : Service(), CoroutineScope {
                 Intent(this, MyService::class.java)
             )
 
-            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).build()
+            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .build()
             val type = if (34 <= Build.VERSION.SDK_INT) FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
             Log.d(TAG, "startForeground")
             ServiceCompat.startForeground(
