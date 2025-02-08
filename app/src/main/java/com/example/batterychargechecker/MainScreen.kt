@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -24,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.batterychargechecker.ui.theme.TextAlpha
@@ -66,9 +72,12 @@ private fun Contents(
 ) {
     Column(
         modifier = modifier
-            .padding(dimensionResource(id = R.dimen.padding_large))
+            .padding(
+                horizontal = dimensionResource(R.dimen.padding_large),
+                vertical = dimensionResource(R.dimen.padding_large)
+            )
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         val monitorOn by viewModel.monitorOn.collectAsStateWithLifecycle()
 
@@ -125,6 +134,28 @@ private fun Contents(
                 onValueChange = { viewModel.setRepeatInterval(it.roundToInt()) },
                 valueRange = 1f..10f,
                 steps = 8,
+            )
+        }
+
+        val beep by viewModel.beepOn.collectAsStateWithLifecycle()
+
+        MyCheckBox(
+            title = stringResource(R.string.beep),
+            checked = beep,
+            onCheckedChange = { viewModel.setBeepOn(it) },
+        )
+
+        val streamType by viewModel.beepStreamType.collectAsStateWithLifecycle()
+
+        if (beep) {
+            MyRadioGroup(
+                title = stringResource(R.string.stream),
+                entries = listOf(
+                    stringResource(R.string.alarm),
+                    stringResource(R.string.notification),
+                ),
+                selected = streamType,
+                onSelected = { viewModel.setBeepStreamType(it) },
             )
         }
     }
@@ -205,5 +236,77 @@ private fun MySlider(
                 )
             }
         )
+    }
+}
+
+@Composable
+private fun MyCheckBox(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Composable
+private fun MyRadioGroup(
+    title: String,
+    entries: List<String>,
+    selected: Int,
+    onSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        entries.forEachIndexed { index, text ->
+            Row(
+                Modifier
+                    .selectable(
+                        selected = (index == selected),
+                        onClick = {
+                            onSelected(index)
+                        },
+                        role = Role.RadioButton
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(id = R.dimen.padding_medium)
+                ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (index == selected),
+                    onClick = null, // null recommended for accessibility with screen readers
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.tertiary
+                    )
+                )
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
     }
 }

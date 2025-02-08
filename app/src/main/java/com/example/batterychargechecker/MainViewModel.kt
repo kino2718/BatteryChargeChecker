@@ -59,6 +59,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    val beepOn =
+        appSettings.beepOn.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    fun setBeepOn(b: Boolean) {
+        viewModelScope.launch {
+            appSettings.updateBeepOn(b)
+        }
+    }
+
+    val beepStreamType =
+        appSettings.beepStreamType.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    fun setBeepStreamType(type: Int) {
+        viewModelScope.launch {
+            appSettings.updateBeepStreamType(type)
+        }
+    }
+
     fun bindMyService() {
         Log.d(TAG, "bindMyService")
         val i = Intent(appContext, MyService::class.java)

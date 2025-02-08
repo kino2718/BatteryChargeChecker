@@ -3,6 +3,9 @@ package com.example.batterychargechecker
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioManager.STREAM_ALARM
+import android.media.AudioManager.STREAM_NOTIFICATION
+import android.media.ToneGenerator
 import android.os.BatteryManager
 import android.os.Build
 import android.os.VibrationEffect
@@ -24,7 +27,7 @@ private data class BatteryStatus(val isCharging: Boolean, val level: Int) {
 suspend fun monitorBattery(context: Context, settingsData: AppSettingsData) {
     var done = false
     while (settingsData.monitorOn) {
-        Log.d(TAG, "monitorBattery: while loop")
+        Log.d(TAG, "monitorBattery: app settings data = $settingsData")
         getBatteryStatus(context)?.let { s ->
             Log.d(TAG, "charging: ${s.isCharging}, level = ${s.level}, done = $done")
             if (s.isChargingFinished(settingsData.targetLevel)) {
@@ -73,6 +76,7 @@ private suspend fun notify(context: Context, settingsData: AppSettingsData): Boo
         Log.d(TAG, "vibrate: $i")
         vibrate(context, settingsData.notificationDuration)
         Log.d(TAG, "exit vibrate: $i")
+        if (settingsData.beepOn) beep(settingsData.beepStreamType)
 
         // 最後はdelayしない
         if (i != settingsData.repeatCount - 1) {
@@ -119,4 +123,11 @@ private fun vibrate(context: Context, duration: Int) {
         }
         vibrator.vibrate(timings.toLongArray(), -1)
     }
+}
+
+private fun beep(streamType: Int) {
+    Log.d(TAG, "beep")
+    val st = if (streamType == 0) STREAM_ALARM else STREAM_NOTIFICATION
+    val gen = ToneGenerator(st, ToneGenerator.MAX_VOLUME)
+    gen.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER)
 }

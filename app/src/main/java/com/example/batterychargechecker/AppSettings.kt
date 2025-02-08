@@ -17,6 +17,8 @@ data class AppSettingsData(
     val notificationDuration: Int,
     val repeatCount: Int,
     val repeatInterval: Int,
+    val beepOn: Boolean,
+    val beepStreamType: Int,
 )
 
 class AppSettings private constructor(context: Context) {
@@ -40,6 +42,14 @@ class AppSettings private constructor(context: Context) {
 
     val repeatInterval = appContext.dataStore.data.map {
         it[PreferencesKeys.REPEAT_INTERVAL] ?: 1
+    }
+
+    val beepOn = appContext.dataStore.data.map {
+        it[PreferencesKeys.BEEP_ON] ?: false
+    }
+
+    val beepStreamType = appContext.dataStore.data.map {
+        it[PreferencesKeys.BEEP_STREAM_TYPE] ?: 0
     }
 
     suspend fun updateMonitorOn(on: Boolean) {
@@ -72,12 +82,26 @@ class AppSettings private constructor(context: Context) {
         }
     }
 
+    suspend fun updateBeepOn(on: Boolean) {
+        appContext.dataStore.edit {
+            it[PreferencesKeys.BEEP_ON] = on
+        }
+    }
+
+    suspend fun updateBeepStreamType(type: Int) {
+        appContext.dataStore.edit {
+            it[PreferencesKeys.BEEP_STREAM_TYPE] = type
+        }
+    }
+
     private object PreferencesKeys {
         val MONITOR_ON = booleanPreferencesKey("monitor_on")
         val TARGET_LEVEL = intPreferencesKey("target_level")
         val NOTIFICATION_DURATION = intPreferencesKey("notification_duration")
         val REPEAT_COUNT = intPreferencesKey("repeat_count")
         val REPEAT_INTERVAL = intPreferencesKey("repeat_interval")
+        val BEEP_ON = booleanPreferencesKey("beep_on")
+        val BEEP_STREAM_TYPE = intPreferencesKey("beep_stream_type")
     }
 
 
@@ -93,8 +117,14 @@ class AppSettings private constructor(context: Context) {
             targetLevel = targetLevel,
             notificationDuration = notificationDuration,
             repeatCount = repeatCount,
-            repeatInterval = repeatInterval
+            repeatInterval = repeatInterval,
+            beepOn = false,
+            beepStreamType = 0,
         )
+    }.combine(beepOn) { appSettingsData, beepOn ->
+        appSettingsData.copy(beepOn = beepOn)
+    }.combine(beepStreamType) { appSettingsData, beepStreamType ->
+        appSettingsData.copy(beepStreamType = beepStreamType)
     }
 
     companion object {

@@ -13,6 +13,10 @@
     <string name="repeat_interval">繰り返し間隔: %1d 分</string>
     <string name="repeat_interval_min">1 分</string>
     <string name="repeat_interval_max">10 分</string>
+    <string name="beep">"ビープ音を鳴らす"</string>
+    <string name="stream">"ストリーム："</string>
+    <string name="alarm">"アラーム"</string>
+    <string name="notification">"通知"</string>
     <string name="service_description">
         Battery Charge Checker はバッテリーレベルの監視と通知を行うためにフォアグランドサービスを使用しています。
     </string>
