@@ -111,20 +111,18 @@ class AppSettings private constructor(context: Context) {
         notificationDuration,
         repeatCount,
         repeatInterval,
-    ) { monitorOn, targetLevel, notificationDuration, repeatCount, repeatInterval ->
+        beepOn,
+        beepStreamType,
+    ) {
         AppSettingsData(
-            monitorOn = monitorOn,
-            targetLevel = targetLevel,
-            notificationDuration = notificationDuration,
-            repeatCount = repeatCount,
-            repeatInterval = repeatInterval,
-            beepOn = false,
-            beepStreamType = 0,
+            monitorOn = it[0] as Boolean,
+            targetLevel = it[1] as Int,
+            notificationDuration = it[2] as Int,
+            repeatCount = it[3] as Int,
+            repeatInterval = it[4] as Int,
+            beepOn = it[5] as Boolean,
+            beepStreamType = it[6] as Int,
         )
-    }.combine(beepOn) { appSettingsData, beepOn ->
-        appSettingsData.copy(beepOn = beepOn)
-    }.combine(beepStreamType) { appSettingsData, beepStreamType ->
-        appSettingsData.copy(beepStreamType = beepStreamType)
     }
 
     companion object {
